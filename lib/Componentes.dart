@@ -51,7 +51,7 @@ class Componentes {
       height: altura * 18 / 100,
       decoration: BoxDecoration(
         image: DecorationImage(
-          image: NetworkImage("assests/Image.png"),
+          image: AssetImage("assests/Image.png"),
           fit: BoxFit.cover,
         ),
         borderRadius: BorderRadius.circular(10),
@@ -92,7 +92,7 @@ class Componentes {
             width: largura,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(produto.img),
+                image: AssetImage(produto.img),
                 fit: BoxFit.cover,
               ),
               borderRadius: BorderRadius.circular(10),
@@ -129,7 +129,7 @@ class Componentes {
                   width: largura * 25 / 100,
                   decoration: BoxDecoration(
                     image: DecorationImage(
-                      image: NetworkImage(produto.img),
+                      image: AssetImage(produto.img),
                       fit: BoxFit.cover,
                     ),
                     borderRadius: BorderRadius.circular(10),
