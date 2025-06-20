@@ -1,6 +1,9 @@
 import 'package:appcoqueiro/Home.dart';
 import 'package:appcoqueiro/Menu.dart';
+import 'package:appcoqueiro/User.dart';
 import 'package:appcoqueiro/carinho.dart';
+import 'package:appcoqueiro/cobra.dart';
+import 'package:appcoqueiro/eventos.dart';
 import 'package:appcoqueiro/produtoSingle.dart';
 import 'package:flutter/material.dart';
 
@@ -39,8 +42,10 @@ class MyApp extends StatelessWidget {
         "/home": (context) => Home(),
          "/menu": (context) => Menu(),
           "/cart": (context) => Carinho(),
-        "/produto":(context) => Produtosingle(),
-      },
+          "/cobra":(context)=>TecladoExemplo(),
+          "/eventos":(context)=>Eventos(),
+          "/user": (context)=> User()
+                },
     );
   }
 }

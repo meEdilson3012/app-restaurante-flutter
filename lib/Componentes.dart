@@ -1,8 +1,12 @@
+import 'package:appcoqueiro/carinho.dart';
 import 'package:appcoqueiro/produto.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Componentes {
+  var carinho = Carinho();
+
   TextStyle styleNormal = TextStyle(
     fontSize: 15,
     fontWeight: FontWeight.normal,
@@ -45,15 +49,12 @@ class Componentes {
     );
   }
 
-  Container anuncio(double largura, altura) {
+  Container anuncio(double largura, altura, String img) {
     return Container(
       width: largura,
       height: altura * 18 / 100,
       decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage("assests/Image.png"),
-          fit: BoxFit.cover,
-        ),
+        image: DecorationImage(image: NetworkImage(img), fit: BoxFit.cover),
         borderRadius: BorderRadius.circular(10),
       ),
       child: Container(
@@ -63,13 +64,13 @@ class Componentes {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            this.texto("Caldo de Chabeu", 18, true, Colors.black),
-            this.texto("Sem taxa", 16, false, Colors.black),
+            this.texto("Tarde Tradicional", 18, true, Colors.black),
+            this.texto("Sexta- 14h", 16, false, Colors.black),
             Container(
-              width: 120,
+              width: 140,
               child: GFButton(
                 color: Color(0xFF307A59),
-                child: this.texto("Pedir Agora", 16, true, Colors.white),
+                child: this.texto("Reservar Agora", 16, true, Colors.white),
                 onPressed: () {},
               ),
             ),
@@ -102,7 +103,12 @@ class Componentes {
           SizedBox(height: 5),
           this.texto(produto.nome, 16, true, Colors.black),
           SizedBox(height: 5),
-          this.texto(produto.preco, 14, true, Color.fromARGB(255, 29, 100, 68)),
+          this.texto(
+            "xof " + produto.preco.toString(),
+            14,
+            true,
+            Color.fromARGB(255, 29, 100, 68),
+          ),
         ],
       ),
     );
@@ -112,7 +118,13 @@ class Componentes {
     return Text(lista[0], style: (lista[1]) ? styleActivo : styleNormal);
   }
 
-  Container carPrato(double largura, Poroduto produto) {
+  Container carPrato(
+    double largura,
+    Poroduto produto,
+    int numero,
+    GestureDetector gesture1,
+    GestureDetector geture2,
+  ) {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
       child: Column(
@@ -135,68 +147,33 @@ class Componentes {
                     borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-                SizedBox(width: 15),
+                SizedBox(width: 5),
                 Container(
                   height: 100 - 32,
-                  width: largura * 40 / 100,
+                  width: largura * 60 / 100,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      this.texto(produto.nome, 16, true, Colors.black),
+                      this.texto(produto.nome, 19, true, Colors.black),
                       SizedBox(height: 3),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: largura * 20 / 100,
-                            padding: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              color: Color.fromARGB(255, 236, 236, 236),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircleAvatar(
-                                    backgroundColor: const Color.fromARGB(
-                                      255,
-                                      170,
-                                      170,
-                                      170,
-                                    ),
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: Colors.black,
-                                      size: 15,
-                                    ),
-                                  ),
-                                ),
-                                this.texto("2", 14, true, Colors.black),
-                                Container(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircleAvatar(
-                                    backgroundColor: Color(0xFF307A59),
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: 15,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-
-                          SizedBox(width: 10),
                           this.texto(
-                            produto.preco,
-                            14,
+                            "xof " + produto.preco.toString(),
+                            18,
                             true,
                             Color(0xFF307A59),
+                          ),
+                          SizedBox(width: 20),
+                          Container(
+                            child: Center(
+                              child: this.texto("2 ", 16, true, Colors.black),
+                            ),
+                            padding: EdgeInsets.all(5),
+                            color: const Color.fromARGB(255, 245, 245, 245),
+                            width: 50,
                           ),
                         ],
                       ),
@@ -217,7 +194,68 @@ class Componentes {
     );
   }
 
-  BottomAppBar AppbarButton(BuildContext context) {
+  Container eventos(String img, double width,GFButton btn) {
+    return Container(
+      
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(10),
+      color: Colors.white,
+      border: Border.all(width: 2,color: const Color.fromARGB(255, 243, 243, 243))
+      ),
+      padding: EdgeInsetsGeometry.all(5),
+      
+      height: 180+190,
+      child: Container(
+        height: 200 / 2,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              
+              width: width,
+              height: 180,
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(5),
+                image: DecorationImage(image: NetworkImage(img),fit: BoxFit.cover),
+              ),
+            ),
+
+            SizedBox(height: 15),
+            Row(
+              children: [
+                Row(
+                  children: [
+                    Icon(Icons.date_range, color: Colors.green),
+                    SizedBox(width: 10),
+                    Componentes().texto("Sexta-Feira", 20, true, Colors.black),
+                  ],
+                ),
+                SizedBox(width: 20),
+                
+                Row(
+                  children: [
+                    Icon(Icons.hourglass_bottom, color: Colors.green),
+                    SizedBox(width: 10),
+                    Componentes().texto("14:00 pm", 20, true, Colors.black),
+                  ],
+                ),
+              ],
+            ),
+            SizedBox(height: 15),
+             Componentes().texto(
+              "Preencha informações para preencha alguma essas informações para confirmar a sua reserva!",
+              16,
+              false,
+              const Color.fromARGB(255, 114, 114, 114),
+            ),SizedBox(width: 20),
+           btn
+          ],
+        ),
+      ),
+    );
+  }
+
+  BottomAppBar AppbarButton(BuildContext context, String numero) {
     return BottomAppBar(
       height: 80,
       color: Color(0xFFFAFAFA),
@@ -247,9 +285,9 @@ class Componentes {
           Column(
             children: [
               IconButton(
-                icon: Icon(Icons.shopping_cart_rounded),
+                icon: Icon(Icons.event),
                 onPressed: () {
-                  Navigator.of(context).pushNamed("/cart");
+                  Navigator.of(context).pushNamed("/eventos");
                 },
               ),
             ],
@@ -259,7 +297,7 @@ class Componentes {
               IconButton(
                 icon: Icon(Icons.person),
                 onPressed: () {
-                  Navigator.of(context).pushNamed("/home");
+                  Navigator.of(context).pushNamed("/user");
                 },
               ),
             ],
@@ -269,5 +307,33 @@ class Componentes {
     );
   }
 
- 
+  AppBar appBar(String titulo, String numero, BuildContext context) {
+    return AppBar(
+      backgroundColor: Colors.white,
+      title: Center(child: Componentes().texto(titulo, 20, true, Colors.black)),
+      actions: [
+        Container(
+          margin: EdgeInsets.only(right: 10, top: 10),
+          child: GFIconBadge(
+            child: GFIconButton(
+              onPressed: () {},
+              icon: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushNamed("/cart");
+                },
+                child: Icon(Icons.shopping_cart_checkout_sharp),
+              ),
+              type: GFButtonType.transparent,
+              color: Colors.black,
+              iconSize: 20,
+            ),
+
+            counterChild: GFBadge(child: Text(numero)),
+          ),
+        ),
+      ],
+    );
+  }
 }
+
+class Int {}

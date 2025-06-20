@@ -2,25 +2,22 @@ import 'package:appcoqueiro/Componentes.dart';
 import 'package:appcoqueiro/produto.dart';
 import 'package:flutter/material.dart';
 import 'package:getwidget/getwidget.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Produtosingle extends StatefulWidget {
-  const Produtosingle({super.key});
-
+  final Poroduto produto;
+  const Produtosingle({Key? key, required this.produto}) : super(key: key);
 
   @override
   State<Produtosingle> createState() => _ProdutosingleState();
 }
 
-
 class _ProdutosingleState extends State<Produtosingle> {
-  Poroduto porodutoActual = new Poroduto(
-    "Massa Italiano",
-    "xof 10.000",
-    "assests/5833.jpg",
-  );
+  int numero = 1;
 
+  int ids_ = 0;
 
+  double preco = 0;
   List<dynamic> ingridientes = [
     ["Cebola", false],
     ["Salsa", false],
@@ -30,51 +27,85 @@ class _ProdutosingleState extends State<Produtosingle> {
     ["Pimenta", false],
     ["Pimenta", false],
   ];
+
+  void mudar(int val) {
+    setState(() {
+      if ((val.isNegative) && (numero <= 1)) {
+      } else {
+        numero = numero + val;
+        preco = widget.produto.preco * numero;
+      }
+    });
+  }
+
+  void marcar(int index) {
+    setState(() {
+      ingridientes[index][1] = !ingridientes[index][1];
+    });
+  }
+
+  Future<List<String>?> lerNome() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getStringList('produtos');
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    lerNome()
+        .then((ids) {
+          if (mounted) {
+            setState(() {
+              ids_ = ids!.length;
+            });
+          }
+        })
+        .catchError((onError) => {print(onError)});
+  }
+
+  
   @override
   Widget build(BuildContext context) {
+    Poroduto porodutoActual = widget.produto;
+    if (preco == 0) {
+      preco = porodutoActual.preco;
+    }
+
     var width = MediaQuery.of(context).size.width;
     var height = MediaQuery.of(context).size.height;
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 241, 241, 241),
-        title: Center(
-          child: Componentes().texto("Produto", 20, true, Colors.black),
-        ),
+      appBar: Componentes().appBar(
+        porodutoActual.nome,
+        ids_.toString(),
+        context,
       ),
 
-
-      body:
-          Container(
+      body:  Container(
+          width: width,
+          height: height,
+          color: Color.fromARGB(255, 241, 241, 241),
+          child: Container(
+            padding: EdgeInsets.all(20),
+            height: height * 60 / 100,
             width: width,
-            height: height,
-            color: Color.fromARGB(255, 241, 241, 241),
-            child: Container(
-              padding: EdgeInsets.all(20),
-              height: height * 80 / 100,
-              width: width,
-
-
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(30),
-                  topRight: Radius.circular(30),
-                ),
-              ),
-              child:Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Container(
-                      height: height *83/100,
-                      child: ListView(
-                       
-                        children: [
-                            Container(
+        
+            decoration: BoxDecoration(color: Colors.white),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  height: height * 83 / 100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
                         width: width,
                         height: height * 25 / 100,
                         decoration: BoxDecoration(
                           image: DecorationImage(
-                            image: NetworkImage("assests/5833.jpg"),
+                            image: AssetImage(porodutoActual.img),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(10),
@@ -87,7 +118,18 @@ class _ProdutosingleState extends State<Produtosingle> {
                         true,
                         Colors.black,
                       ),
-                      Componentes().texto("Comida Italiada", 16, true, Colors.grey),
+                      Componentes().texto(
+                        porodutoActual.categoria,
+                        16,
+                        true,
+                        Colors.grey,
+                      ),
+                      Componentes().texto(
+                        "Get Flutter is one of the largest Flutter open-source et Flutter is one of the largest Flutter open-source UI library for mobile open-source UI library for mobile",
+                        14,
+                        false,
+                        Colors.black,
+                      ),
                       SizedBox(height: 20),
                       Row(
                         children: [
@@ -111,36 +153,49 @@ class _ProdutosingleState extends State<Produtosingle> {
                                       170,
                                       170,
                                     ),
-                                    child: Icon(
-                                      Icons.remove,
-                                      color: Colors.black,
-                                      size: 20,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        mudar(-1);
+                                      },
+                                      child: Icon(
+                                        Icons.remove,
+                                        color: Colors.black,
+                                        size: 15,
+                                      ),
                                     ),
                                   ),
                                 ),
-                                Componentes().texto("2", 18, true, Colors.black),
-                                      
-                                      
+                                Componentes().texto(
+                                  numero.toString(),
+                                  18,
+                                  true,
+                                  Colors.black,
+                                ),
+        
                                 Container(
                                   width: 30,
                                   height: 30,
                                   child: CircleAvatar(
                                     backgroundColor: Color(0xFF307A59),
-                                    child: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                      size: 20,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        mudar(1);
+                                      },
+                                      child: Icon(
+                                        Icons.add,
+                                        color: Colors.black,
+                                        size: 15,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ],
                             ),
                           ),
-                                      
-                                      
+        
                           SizedBox(width: 20),
                           Componentes().texto(
-                            porodutoActual.preco,
+                            "xof " + preco.toString(),
                             20,
                             true,
                             Color.fromARGB(255, 4, 75, 43),
@@ -152,83 +207,145 @@ class _ProdutosingleState extends State<Produtosingle> {
                         height: 1,
                         color: const Color.fromARGB(255, 214, 214, 214),
                       ),
-                      SizedBox(height: 20),
+                      SizedBox(height: 10),
                       Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            width: 1,
-                            color: const Color.fromARGB(255, 214, 214, 214),
-                          ),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        height: 300,
+                       
+                        height: 240,
                         child: ListView.builder(
-                          itemCount: ingridientes.length,
+                          scrollDirection: Axis.vertical,
+                          itemCount: (ingridientes.length / 3).ceil(),
+        
                           itemBuilder: (context, index) {
+                            final int first = index * 3;
+                            final int second = first + 1;
+                            final int tird = second + 1;
+        
                             return Container(
-                              decoration: BoxDecoration(
-                                border: Border(
-                                  bottom: BorderSide(
-                                    color: const Color.fromARGB(255, 214, 214, 214),
+                              margin: EdgeInsets.only(top: 20),
+                          
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  GestureDetector(
+                                    onTap: () {
+                                      marcar(first);
+                                    },
+                                    child: Container(
+                                      width: 110,
+                                      height: 50,
+                                      decoration: BoxDecoration(
+                                        color: (!ingridientes[first][1])? const Color.fromARGB(
+                                          255,
+                                          245,
+                                          245,
+                                          245,
+                                        ): const Color.fromARGB(255, 0, 167, 6),
+                                        borderRadius: BorderRadius.circular(15),
+                                      ),
+                                      child: Center(
+                                        child: Componentes().texto(
+                                          ingridientes[first][0],
+                                          18,
+                                          true,
+                                          (!ingridientes[first][1])? Colors.black: Colors.white
+                                        ),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              child: GFCheckboxListTile(
-                                padding: EdgeInsets.all(2),
-                                title: Componentes().texto(
-                                  ingridientes[index][0],
-                                  18,
-                                  true,
-                                  Colors.black,
-                                ),
-                                size: 20,
-                                activeBgColor: Colors.green,
-                                type: GFCheckboxType.square,
-                                activeIcon: Icon(
-                                  Icons.check,
-                                  size: 15,
-                                  color: Colors.white,
-                                ),
-                                onChanged: (value) {
-                                  setState(() {
-                                    print("dsds");
-                                    ingridientes[index][1] = value;
-                                  });
-                                },
-                                value: ingridientes[index][1],
-                                inactiveIcon: null,
+        
+                                  if (second < ingridientes.length)
+                                    GestureDetector(
+                                       onTap: () {
+                                      marcar(second);
+                                    },
+                                      child: Container(
+                                        width: 110,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: (!ingridientes[second][1])? const Color.fromARGB(
+                                            255,
+                                            245,
+                                            245,
+                                            245,
+                                          ): const Color.fromARGB(255, 0, 167, 6),
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        child: Center(
+                                          child: Componentes().texto(
+                                            ingridientes[second][0],
+                                            18,
+                                            true,
+                                           (!ingridientes[second][1])? Colors.black: Colors.white
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Expanded(child: SizedBox()),
+        
+                                  if (tird < ingridientes.length)
+                                    GestureDetector(
+                                       onTap: () {
+                                      marcar(tird);
+                                    },
+                                      child: Container(
+                                        width: 110,
+                                        height: 50,
+                                        decoration: BoxDecoration(
+                                          color: (!ingridientes[tird][1])? const Color.fromARGB(
+                                            255,
+                                            245,
+                                            245,
+                                            245,
+                                          ): const Color.fromARGB(255, 0, 167, 6),
+                                          borderRadius: BorderRadius.circular(15),
+                                        ),
+                                        child: Center(
+                                          child: Componentes().texto(
+                                            ingridientes[tird][0],
+                                            18,
+                                            true,
+                                           (!ingridientes[tird][1])? Colors.black: Colors.white
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                  else
+                                    Expanded(child: SizedBox()),
+                                ],
                               ),
                             );
                           },
                         ),
                       ),
-                      
-                        ],
-                      ),
-                    ),
-                    GFButton(
-                        size: 50,
-                        color: Color.fromARGB(255, 22, 100, 65),
-                        fullWidthButton: true,
-                       child: Componentes().texto("Adicionar (xof 10.000)", 18, true, Colors.white),
-                        onPressed: (){
-                      
-                      }),
-                    
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-
-
-
-
-          )
-
-    
-               
+                GFButton(
+                  size: 50,
+                  color: Color.fromARGB(255, 22, 100, 65),
+                  fullWidthButton: true,
+                  child: Componentes().texto(
+                    "Adicionar ( xof " + porodutoActual.preco.toString() + ")",
+                    18,
+                    true,
+                    Colors.white,
+                  ),
+                  onPressed: () async { 
+                    final shared = await SharedPreferences.getInstance();
+                    List<String>? listaProdutos =
+                        (shared.getStringList("produtos") != null)
+                        ? shared.getStringList("produtos")
+                        : [];
+                    listaProdutos?.add(porodutoActual.nome);
+                    shared.setStringList("produtos", listaProdutos!);
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
+      
     );
   }
 }
-
-
-
